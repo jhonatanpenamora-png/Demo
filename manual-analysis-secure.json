@@ -1,0 +1,15 @@
+{
+  "scenario": "secure",
+  "description": "Manual STRIDE analysis of a hardened REST API application after applying security mitigations. Most attack surfaces have been addressed; only a residual low-risk finding remains.",
+  "analyst": "Security Analyst",
+  "date": "2026-04-24",
+  "threats": [
+    {
+      "category": "InformationDisclosure",
+      "component": "Info Leak Attack",
+      "description": "Slight variation in error responses between valid and invalid usernames may assist user enumeration, though risk is low after rate-limiting was applied.",
+      "severity": "Baja",
+      "mitigation": "Return uniform error messages regardless of whether the username exists."
+    }
+  ]
+}

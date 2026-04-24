@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STRIDE Comparison Metrics Report</title>
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --subtext: #8b949e;
+    --blue: #388bfd; --green: #3fb950; --red: #f85149;
+    --purple: #bc8cff; --orange: #d29922; --teal: #39c5cf;
+    --yellow: #e3b341;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 24px; }
+  h1 { font-size: 1.8rem; margin-bottom: 4px; }
+  .subtitle { color: var(--subtext); margin-bottom: 32px; font-size: 0.9rem; }
+  .section { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 24px; }
+  h2 { font-size: 1.2rem; margin-bottom: 16px; color: var(--blue); }
+  h3 { font-size: 1rem; margin-bottom: 12px; color: var(--subtext); }
+  .cards { display: flex; flex-wrap: wrap; gap: 14px; }
+  .card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; min-width: 120px; text-align: center; }
+  .card-value { font-size: 2rem; font-weight: 700; }
+  .card-label { font-size: 0.75rem; color: var(--subtext); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .card.blue   .card-value { color: var(--blue); }
+  .card.green  .card-value { color: var(--green); }
+  .card.red    .card-value { color: var(--red); }
+  .card.purple .card-value { color: var(--purple); }
+  .card.orange .card-value { color: var(--orange); }
+  .card.teal   .card-value { color: var(--teal); }
+  .card.yellow .card-value { color: var(--yellow); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  th { text-align: left; padding: 8px 12px; color: var(--subtext); border-bottom: 1px solid var(--border); }
+  td { padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .num { text-align: center; font-weight: 600; font-size: 1rem; }
+  .tp { color: var(--green); }
+  .fp { color: var(--red); }
+  .fn { color: var(--yellow); }
+  .badge { background: #21262d; border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; font-size: 0.8rem; white-space: nowrap; }
+  .sev-alta  { color: var(--red); font-weight: 600; }
+  .sev-media { color: var(--orange); font-weight: 600; }
+  .sev-baja  { color: var(--green); font-weight: 600; }
+  details { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
+  summary { padding: 12px 16px; cursor: pointer; font-weight: 600; user-select: none; }
+  details[open] summary { border-bottom: 1px solid var(--border); }
+  summary.det-fp { background: rgba(248,81,73,0.12); color: var(--red); }
+  summary.det-fn { background: rgba(227,179,65,0.12); color: var(--yellow); }
+  summary.det-tp { background: rgba(63,185,80,0.12); color: var(--green); }
+  details table { margin: 0; }
+  details td, details th { background: var(--bg); }
+  .empty { color: var(--subtext); font-style: italic; margin: 8px 0; }
+  .tabs { display: flex; gap: 0; margin-bottom: -1px; }
+  .tab { padding: 10px 20px; cursor: pointer; border: 1px solid var(--border); border-bottom: none; border-radius: 6px 6px 0 0; background: var(--bg); color: var(--subtext); font-weight: 600; }
+  .tab.active { background: var(--surface); color: var(--text); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .tab-wrap { border: 1px solid var(--border); border-radius: 0 8px 8px 8px; background: var(--surface); padding: 20px; margin-bottom: 24px; }
+  @media (max-width: 640px) { .cards { flex-direction: column; } }
+</style>
+</head>
+<body>
+<h1>🛡️ STRIDE Comparison Metrics Report</h1>
+<p class="subtitle">Generated: 4/24/2026, 9:10:39 PM &nbsp;·&nbsp; Automated source: <code>Attack-Simulation-FDSI/combined-report.json</code></p>
+
+
+  <div class="section">
+    <h2>🌐 Global Metrics (Both Scenarios)</h2>
+    <div class="cards">
+      <div class="card blue"><div class="card-value">70.0%</div><div class="card-label">Precision</div></div>
+      <div class="card green"><div class="card-value">77.8%</div><div class="card-label">Recall</div></div>
+      <div class="card purple"><div class="card-value">73.7%</div><div class="card-label">F1 Score</div></div>
+      <div class="card orange"><div class="card-value">80.0%</div><div class="card-label">STRIDE Coverage</div></div>
+      <div class="card teal"><div class="card-value">7</div><div class="card-label">True Positives</div></div>
+      <div class="card red"><div class="card-value">3</div><div class="card-label">False Positives</div></div>
+      <div class="card yellow"><div class="card-value">2</div><div class="card-label">False Negatives</div></div>
+    </div>
+  </div>
+
+<div class="section">
+  <h3>Global STRIDE Category Breakdown</h3>
+  <table>
+    <thead><tr><th>Category</th><th>TP ✅</th><th>FP ⚠️</th><th>FN ❌</th></tr></thead>
+    <tbody><tr><td><span class="badge">Spoofing</span></td><td class="num tp">2</td><td class="num fp">1</td><td class="num fn">0</td></tr><tr><td><span class="badge">Tampering</span></td><td class="num tp">2</td><td class="num fp">0</td><td class="num fn">0</td></tr><tr><td><span class="badge">Repudiation</span></td><td class="num tp">0</td><td class="num fp">0</td><td class="num fn">1</td></tr><tr><td><span class="badge">InformationDisclosure</span></td><td class="num tp">2</td><td class="num fp">1</td><td class="num fn">1</td></tr><tr><td><span class="badge">DenialOfService</span></td><td class="num tp">0</td><td class="num fp">1</td><td class="num fn">0</td></tr><tr><td><span class="badge">ElevationOfPrivilege</span></td><td class="num tp">1</td><td class="num fp">0</td><td class="num fn">0</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('insecure', this)">🔴 Insecure Scenario</div>
+  <div class="tab" onclick="showTab('secure', this)">🟢 Secure Scenario</div>
+</div>
+<div class="tab-wrap">
+  <div id="tab-insecure" class="tab-content active">
+    
+  <div class="section">
+    <h2>Insecure Scenario</h2>
+    <div class="cards">
+      <div class="card blue"><div class="card-value">60.0%</div><div class="card-label">Precision</div></div>
+      <div class="card green"><div class="card-value">75.0%</div><div class="card-label">Recall</div></div>
+      <div class="card purple"><div class="card-value">66.7%</div><div class="card-label">F1 Score</div></div>
+      <div class="card orange"><div class="card-value">80.0%</div><div class="card-label">STRIDE Coverage</div></div>
+      <div class="card teal"><div class="card-value">6</div><div class="card-label">True Positives</div></div>
+      <div class="card red"><div class="card-value">4</div><div class="card-label">False Positives</div></div>
+      <div class="card yellow"><div class="card-value">2</div><div class="card-label">False Negatives</div></div>
+    </div>
+  </div>
+    
+  <div class="section">
+    <h3>STRIDE Category Breakdown</h3>
+    <table>
+      <thead><tr><th>Category</th><th>TP ✅</th><th>FP ⚠️</th><th>FN ❌</th></tr></thead>
+      <tbody>
+      <tr>
+        <td><span class="badge">Spoofing</span></td>
+        <td class="num tp">2</td>
+        <td class="num fp">1</td>
+        <td class="num fn">0</td>
+      </tr>
+      <tr>
+        <td><span class="badge">Tampering</span></td>
+        <td class="num tp">2</td>
+        <td class="num fp">0</td>
+        <td class="num fn">0</td>
+      </tr>
+      <tr>
+        <td><span class="badge">Repudiation</span></td>
+        <td class="num tp">0</td>
+        <td class="num fp">0</td>
+        <td class="num fn">1</td>
+      </tr>
+      <tr>
+        <td><span class="badge">InformationDisclosure</span></td>
+        <td class="num tp">1</td>
+        <td class="num fp">2</td>
+        <td class="num fn">1</td>
+      </tr>
+      <tr>
+        <td><span class="badge">DenialOfService</span></td>
+        <td class="num tp">0</td>
+        <td class="num fp">1</td>
+        <td class="num fn">0</td>
+      </tr>
+      <tr>
+        <td><span class="badge">ElevationOfPrivilege</span></td>
+        <td class="num tp">1</td>
+        <td class="num fp">0</td>
+        <td class="num fn">0</td>
+      </tr></tbody>
+    </table>
+  </div>
+    
+  <div class="section">
+    <h3>Severity Breakdown</h3>
+    <table>
+      <thead><tr><th>Severity</th><th>TP ✅</th><th>FP ⚠️</th><th>FN ❌</th></tr></thead>
+      <tbody>
+      <tr>
+        <td><span class="sev-alta">Alta</span></td>
+        <td class="num tp">6</td>
+        <td class="num fp">0</td>
+        <td class="num fn">1</td>
+      </tr>
+      <tr>
+        <td><span class="sev-media">Media</span></td>
+        <td class="num tp">0</td>
+        <td class="num fp">2</td>
+        <td class="num fn">1</td>
+      </tr>
+      <tr>
+        <td><span class="sev-baja">Baja</span></td>
+        <td class="num tp">0</td>
+        <td class="num fp">2</td>
+        <td class="num fn">0</td>
+      </tr></tbody>
+    </table>
+  </div>
+    <div class="section"><h3>Details</h3>
+    
+  <details id="ins-fp">
+    <summary class="det-fp">False Positives (automated only) (4)</summary>
+    <table>
+      <thead><tr><th>Category</th><th>Component</th><th>Severity</th><th>Description</th></tr></thead>
+      <tbody><tr>
+      <td><span class="badge">Spoofing</span></td>
+      <td>Session Fixation Attack</td>
+      <td><span class="sev-media">Media</span></td>
+      <td>Session fixation vulnerability detected. Session ID not regenerated after authentication.</td>
+    </tr><tr>
+      <td><span class="badge">InformationDisclosure</span></td>
+      <td>Info Leak Attack</td>
+      <td><span class="sev-baja">Baja</span></td>
+      <td>Information leakage detected. Different responses allow user enumeration.</td>
+    </tr><tr>
+      <td><span class="badge">InformationDisclosure</span></td>
+      <td>Insecure HTTP Headers Attack</td>
+      <td><span class="sev-media">Media</span></td>
+      <td>Missing security headers increase risk of attacks.</td>
+    </tr><tr>
+      <td><span class="badge">DenialOfService</span></td>
+      <td>Brute Force Attack</td>
+      <td><span class="sev-baja">Baja</span></td>
+      <td>Rate limiting detected. Blocked after multiple attempts.</td>
+    </tr></tbody>
+    </table>
+  </details>
+    
+  <details id="ins-fn">
+    <summary class="det-fn">False Negatives (manual only) (2)</summary>
+    <table>
+      <thead><tr><th>Category</th><th>Component</th><th>Severity</th><th>Description</th></tr></thead>
+      <tbody><tr>
+      <td><span class="badge">Repudiation</span></td>
+      <td>Audit Log Tampering</td>
+      <td><span class="sev-media">Media</span></td>
+      <td>Application lacks immutable audit logging; actions can be performed without a traceable record.</td>
+    </tr><tr>
+      <td><span class="badge">InformationDisclosure</span></td>
+      <td>Hardcoded Credentials</td>
+      <td><span class="sev-alta">Alta</span></td>
+      <td>Database passwords and API keys are stored in plaintext within configuration files.</td>
+    </tr></tbody>
+    </table>
+  </details>
+    
+  <details id="ins-tp">
+    <summary class="det-tp">True Positives (matched) (6)</summary>
+    <table>
+      <thead><tr><th>Category</th><th>Component</th><th>Severity</th><th>Description</th></tr></thead>
+      <tbody><tr>
+      <td><span class="badge">Spoofing</span></td>
+      <td>CORS Attack</td>
+      <td><span class="sev-alta">Alta</span></td>
+      <td>Critical CORS vulnerability. Server allows requests from ANY origin (*). This enables cross-site attacks and data theft.</td>
+    </tr><tr>
+      <td><span class="badge">Spoofing</span></td>
+      <td>JWT Token Attack</td>
+      <td><span class="sev-alta">Alta</span></td>
+      <td>JWT token validation vulnerability. Tampered token accepted. Signature not properly verified.</td>
+    </tr><tr>
+      <td><span class="badge">Tampering</span></td>
+      <td>SQL Injection Attack</td>
+      <td><span class="sev-alta">Alta</span></td>
+      <td>SQL injection successful using payload. Response indicates successful authentication.</td>
+    </tr><tr>
+      <td><span class="badge">Tampering</span></td>
+      <td>XSS Attack</td>
+      <td><span class="sev-alta">Alta</span></td>
+      <td>XSS vulnerability detected. Payload reflected in response without proper encoding.</td>
+    </tr><tr>
+      <td><span class="badge">InformationDisclosure</span></td>
+      <td>Path Traversal Attack</td>
+      <td><span class="sev-alta">Alta</span></td>
+      <td>Path traversal vulnerability detected. System files accessible.</td>
+    </tr><tr>
+      <td><span class="badge">ElevationOfPrivilege</span></td>
+      <td>Weak Password Attack</td>
+      <td><span class="sev-alta">Alta</span></td>
+      <td>Weak password policy detected. Weak passwords accepted.</td>
+    </tr></tbody>
+    </table>
+  </details></div>
+  </div>
+  <div id="tab-secure" class="tab-content">
+    
+  <div class="section">
+    <h2>Secure Scenario</h2>
+    <div class="cards">
+      <div class="card blue"><div class="card-value">10.0%</div><div class="card-label">Precision</div></div>
+      <div class="card green"><div class="card-value">100.0%</div><div class="card-label">Recall</div></div>
+      <div class="card purple"><div class="card-value">18.2%</div><div class="card-label">F1 Score</div></div>
+      <div class="card orange"><div class="card-value">100.0%</div><div class="card-label">STRIDE Coverage</div></div>
+      <div class="card teal"><div class="card-value">1</div><div class="card-label">True Positives</div></div>
+      <div class="card red"><div class="card-value">9</div><div class="card-label">False Positives</div></div>
+      <div class="card yellow"><div class="card-value">0</div><div class="card-label">False Negatives</div></div>
+    </div>
+  </div>
+    
+  <div class="section">
+    <h3>STRIDE Category Breakdown</h3>
+    <table>
+      <thead><tr><th>Category</th><th>TP ✅</th><th>FP ⚠️</th><th>FN ❌</th></tr></thead>
+      <tbody>
+      <tr>
+        <td><span class="badge">Spoofing</span></td>
+        <td class="num tp">0</td>
+        <td class="num fp">3</td>
+        <td class="num fn">0</td>
+      </tr>
+      <tr>
+        <td><span class="badge">Tampering</span></td>
+        <td class="num tp">0</td>
+        <td class="num fp">2</td>
+        <td class="num fn">0</td>
+      </tr>
+      <tr>
+        <td><span class="badge">Repudiation</span></td>
+        <td class="num tp">0</td>
+        <td class="num fp">0</td>
+        <td class="num fn">0</td>
+      </tr>
+      <tr>
+        <td><span class="badge">InformationDisclosure</span></td>
+        <td class="num tp">1</td>
+        <td class="num fp">2</td>
+        <td class="num fn">0</td>
+      </tr>
+      <tr>
+        <td><span class="badge">DenialOfService</span></td>
+        <td class="num tp">0</td>
+        <td class="num fp">1</td>
+        <td class="num fn">0</td>
+      </tr>
+      <tr>
+        <td><span class="badge">ElevationOfPrivilege</span></td>
+        <td class="num tp">0</td>
+        <td class="num fp">1</td>
+        <td class="num fn">0</td>
+      </tr></tbody>
+    </table>
+  </div>
+    
+  <div class="section">
+    <h3>Severity Breakdown</h3>
+    <table>
+      <thead><tr><th>Severity</th><th>TP ✅</th><th>FP ⚠️</th><th>FN ❌</th></tr></thead>
+      <tbody>
+      <tr>
+        <td><span class="sev-alta">Alta</span></td>
+        <td class="num tp">0</td>
+        <td class="num fp">6</td>
+        <td class="num fn">0</td>
+      </tr>
+      <tr>
+        <td><span class="sev-media">Media</span></td>
+        <td class="num tp">0</td>
+        <td class="num fp">2</td>
+        <td class="num fn">0</td>
+      </tr>
+      <tr>
+        <td><span class="sev-baja">Baja</span></td>
+        <td class="num tp">1</td>
+        <td class="num fp">1</td>
+        <td class="num fn">0</td>
+      </tr></tbody>
+    </table>
+  </div>
+    <div class="section"><h3>Details</h3>
+    
+  <details id="sec-fp">
+    <summary class="det-fp">False Positives (automated only) (9)</summary>
+    <table>
+      <thead><tr><th>Category</th><th>Component</th><th>Severity</th><th>Description</th></tr></thead>
+      <tbody><tr>
+      <td><span class="badge">Spoofing</span></td>
+      <td>CORS Attack</td>
+      <td><span class="sev-alta">Alta</span></td>
+      <td>Critical CORS vulnerability. Server allows requests from ANY origin (*). This enables cross-site attacks and data theft.</td>
+    </tr><tr>
+      <td><span class="badge">Spoofing</span></td>
+      <td>JWT Token Attack</td>
+      <td><span class="sev-alta">Alta</span></td>
+      <td>JWT token validation vulnerability. Tampered token accepted. Signature not properly verified.</td>
+    </tr><tr>
+      <td><span class="badge">Spoofing</span></td>
+      <td>Session Fixation Attack</td>
+      <td><span class="sev-media">Media</span></td>
+      <td>Session fixation vulnerability detected. Session ID not regenerated after authentication.</td>
+    </tr><tr>
+      <td><span class="badge">Tampering</span></td>
+      <td>SQL Injection Attack</td>
+      <td><span class="sev-alta">Alta</span></td>
+      <td>SQL injection successful using payload. Response indicates successful authentication.</td>
+    </tr><tr>
+      <td><span class="badge">Tampering</span></td>
+      <td>XSS Attack</td>
+      <td><span class="sev-alta">Alta</span></td>
+      <td>XSS vulnerability detected. Payload reflected in response without proper encoding.</td>
+    </tr><tr>
+      <td><span class="badge">InformationDisclosure</span></td>
+      <td>Insecure HTTP Headers Attack</td>
+      <td><span class="sev-media">Media</span></td>
+      <td>Missing security headers increase risk of attacks.</td>
+    </tr><tr>
+      <td><span class="badge">InformationDisclosure</span></td>
+      <td>Path Traversal Attack</td>
+      <td><span class="sev-alta">Alta</span></td>
+      <td>Path traversal vulnerability detected. System files accessible.</td>
+    </tr><tr>
+      <td><span class="badge">DenialOfService</span></td>
+      <td>Brute Force Attack</td>
+      <td><span class="sev-baja">Baja</span></td>
+      <td>Rate limiting detected. Blocked after multiple attempts.</td>
+    </tr><tr>
+      <td><span class="badge">ElevationOfPrivilege</span></td>
+      <td>Weak Password Attack</td>
+      <td><span class="sev-alta">Alta</span></td>
+      <td>Weak password policy detected. Weak passwords accepted.</td>
+    </tr></tbody>
+    </table>
+  </details>
+    <p class="empty">No False Negatives (manual only) found.</p>
+    
+  <details id="sec-tp">
+    <summary class="det-tp">True Positives (matched) (1)</summary>
+    <table>
+      <thead><tr><th>Category</th><th>Component</th><th>Severity</th><th>Description</th></tr></thead>
+      <tbody><tr>
+      <td><span class="badge">InformationDisclosure</span></td>
+      <td>Info Leak Attack</td>
+      <td><span class="sev-baja">Baja</span></td>
+      <td>Information leakage detected. Different responses allow user enumeration.</td>
+    </tr></tbody>
+    </table>
+  </details></div>
+  </div>
+</div>
+
+<script>
+function showTab(name, el) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>

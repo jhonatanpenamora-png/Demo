@@ -1,0 +1,699 @@
+{
+  "metadata": {
+    "timestamp": "2026-04-24T21:10:39.833Z",
+    "inputs": {
+      "automated": "Attack-Simulation-FDSI/combined-report.json",
+      "manual_insecure": "manual-analysis-insecure.json",
+      "manual_secure": "manual-analysis-secure.json"
+    }
+  },
+  "global": {
+    "counts": {
+      "TP": 7,
+      "FP": 3,
+      "FN": 2
+    },
+    "precision": 0.7,
+    "recall": 0.7778,
+    "f1": 0.7368,
+    "strideCoverage": 0.8,
+    "bySeverity": {
+      "Alta": {
+        "TP": 6,
+        "FP": 0,
+        "FN": 1
+      },
+      "Media": {
+        "TP": 0,
+        "FP": 2,
+        "FN": 1
+      },
+      "Baja": {
+        "TP": 1,
+        "FP": 1,
+        "FN": 0
+      }
+    },
+    "byCategory": {
+      "Spoofing": {
+        "TP": 2,
+        "FP": 1,
+        "FN": 0
+      },
+      "Tampering": {
+        "TP": 2,
+        "FP": 0,
+        "FN": 0
+      },
+      "Repudiation": {
+        "TP": 0,
+        "FP": 0,
+        "FN": 1
+      },
+      "InformationDisclosure": {
+        "TP": 2,
+        "FP": 1,
+        "FN": 1
+      },
+      "DenialOfService": {
+        "TP": 0,
+        "FP": 1,
+        "FN": 0
+      },
+      "ElevationOfPrivilege": {
+        "TP": 1,
+        "FP": 0,
+        "FN": 0
+      }
+    },
+    "details": {
+      "tp": [
+        {
+          "id": "spoofing|corsattack|alta",
+          "threat": {
+            "category": "Spoofing",
+            "component": "CORS Attack",
+            "description": "Critical CORS vulnerability. Server allows requests from ANY origin (*). This enables cross-site attacks and data theft.",
+            "evidence": "Response contains 'Access-Control-Allow-Origin: *'",
+            "severity": "Alta",
+            "mitigation": "Restrict CORS to specific trusted origins.",
+            "confirmed": null,
+            "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+            "dynamic_validation": null
+          }
+        },
+        {
+          "id": "spoofing|jwttokenattack|alta",
+          "threat": {
+            "category": "Spoofing",
+            "component": "JWT Token Attack",
+            "description": "JWT token validation vulnerability. Tampered token accepted. Signature not properly verified.",
+            "evidence": "Tampered token accepted without proper validation.",
+            "severity": "Alta",
+            "mitigation": "Ensure proper signature verification for JWT tokens.",
+            "confirmed": null,
+            "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+            "dynamic_validation": null
+          }
+        },
+        {
+          "id": "tampering|sqlinjectionattack|alta",
+          "threat": {
+            "category": "Tampering",
+            "component": "SQL Injection Attack",
+            "description": "SQL injection successful using payload. Response indicates successful authentication.",
+            "evidence": "Response contains 'success' or 'token' after injection payload.",
+            "severity": "Alta",
+            "mitigation": "Use prepared statements and parameterized queries to prevent SQL injection.",
+            "confirmed": true,
+            "confirmation_reason": null,
+            "dynamic_validation": {
+              "attack": "SQL Injection",
+              "evidence": "Detected payload reflection",
+              "response_code": 200
+            }
+          }
+        },
+        {
+          "id": "tampering|xssattack|alta",
+          "threat": {
+            "category": "Tampering",
+            "component": "XSS Attack",
+            "description": "XSS vulnerability detected. Payload reflected in response without proper encoding.",
+            "evidence": "Payload '<script>alert('XSS')</script>' reflected in response.",
+            "severity": "Alta",
+            "mitigation": "Sanitize and encode user inputs to prevent XSS.",
+            "confirmed": true,
+            "confirmation_reason": null,
+            "dynamic_validation": {
+              "attack": "SQL Injection",
+              "evidence": "Detected payload reflection",
+              "response_code": 200
+            }
+          }
+        },
+        {
+          "id": "informationdisclosure|infoleakattack|baja",
+          "threat": {
+            "category": "InformationDisclosure",
+            "component": "Info Leak Attack",
+            "description": "Information leakage detected. Different responses allow user enumeration.",
+            "evidence": "Invalid user response differs from valid user response.",
+            "severity": "Baja",
+            "mitigation": "Ensure consistent responses for valid and invalid usernames.",
+            "confirmed": null,
+            "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+            "dynamic_validation": null
+          }
+        },
+        {
+          "id": "informationdisclosure|pathtraversalattack|alta",
+          "threat": {
+            "category": "InformationDisclosure",
+            "component": "Path Traversal Attack",
+            "description": "Path traversal vulnerability detected. System files accessible.",
+            "evidence": "Response contains sensitive file content.",
+            "severity": "Alta",
+            "mitigation": "Validate and sanitize file paths to prevent path traversal.",
+            "confirmed": null,
+            "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+            "dynamic_validation": null
+          }
+        },
+        {
+          "id": "elevationofprivilege|weakpasswordattack|alta",
+          "threat": {
+            "category": "ElevationOfPrivilege",
+            "component": "Weak Password Attack",
+            "description": "Weak password policy detected. Weak passwords accepted.",
+            "evidence": "Accepted weak password: '123456'.",
+            "severity": "Alta",
+            "mitigation": "Enforce strong password policies requiring complexity.",
+            "confirmed": null,
+            "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+            "dynamic_validation": null
+          }
+        }
+      ],
+      "fp": [
+        {
+          "id": "spoofing|sessionfixationattack|media",
+          "threat": {
+            "category": "Spoofing",
+            "component": "Session Fixation Attack",
+            "description": "Session fixation vulnerability detected. Session ID not regenerated after authentication.",
+            "evidence": "Same session ID used before and after login.",
+            "severity": "Media",
+            "mitigation": "Regenerate session ID upon successful login.",
+            "confirmed": null,
+            "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+            "dynamic_validation": null
+          }
+        },
+        {
+          "id": "informationdisclosure|insecurehttpheadersattack|media",
+          "threat": {
+            "category": "InformationDisclosure",
+            "component": "Insecure HTTP Headers Attack",
+            "description": "Missing security headers increase risk of attacks.",
+            "evidence": "Missing headers: X-Frame-Options, X-Content-Type-Options, etc.",
+            "severity": "Media",
+            "mitigation": "Implement essential security headers in HTTP responses.",
+            "confirmed": null,
+            "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+            "dynamic_validation": null
+          }
+        },
+        {
+          "id": "denialofservice|bruteforceattack|baja",
+          "threat": {
+            "category": "DenialOfService",
+            "component": "Brute Force Attack",
+            "description": "Rate limiting detected. Blocked after multiple attempts.",
+            "evidence": "Response indicates rate limiting after several login attempts.",
+            "severity": "Baja",
+            "mitigation": "Implement account lockout mechanisms and rate limiting.",
+            "confirmed": null,
+            "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+            "dynamic_validation": null
+          }
+        }
+      ],
+      "fn": [
+        {
+          "id": "repudiation|auditlogtampering|media",
+          "threat": {
+            "category": "Repudiation",
+            "component": "Audit Log Tampering",
+            "description": "Application lacks immutable audit logging; actions can be performed without a traceable record.",
+            "severity": "Media",
+            "mitigation": "Implement tamper-evident, append-only audit logs with timestamps and user context."
+          }
+        },
+        {
+          "id": "informationdisclosure|hardcodedcredentials|alta",
+          "threat": {
+            "category": "InformationDisclosure",
+            "component": "Hardcoded Credentials",
+            "description": "Database passwords and API keys are stored in plaintext within configuration files.",
+            "severity": "Alta",
+            "mitigation": "Move secrets to environment variables or a secrets manager."
+          }
+        }
+      ]
+    }
+  },
+  "scenarios": {
+    "insecure": {
+      "counts": {
+        "TP": 6,
+        "FP": 4,
+        "FN": 2
+      },
+      "precision": 0.6,
+      "recall": 0.75,
+      "f1": 0.6667,
+      "strideCoverage": 0.8,
+      "bySeverity": {
+        "Alta": {
+          "TP": 6,
+          "FP": 0,
+          "FN": 1
+        },
+        "Media": {
+          "TP": 0,
+          "FP": 2,
+          "FN": 1
+        },
+        "Baja": {
+          "TP": 0,
+          "FP": 2,
+          "FN": 0
+        }
+      },
+      "byCategory": {
+        "Spoofing": {
+          "TP": 2,
+          "FP": 1,
+          "FN": 0
+        },
+        "Tampering": {
+          "TP": 2,
+          "FP": 0,
+          "FN": 0
+        },
+        "Repudiation": {
+          "TP": 0,
+          "FP": 0,
+          "FN": 1
+        },
+        "InformationDisclosure": {
+          "TP": 1,
+          "FP": 2,
+          "FN": 1
+        },
+        "DenialOfService": {
+          "TP": 0,
+          "FP": 1,
+          "FN": 0
+        },
+        "ElevationOfPrivilege": {
+          "TP": 1,
+          "FP": 0,
+          "FN": 0
+        }
+      },
+      "details": {
+        "tp": [
+          {
+            "id": "spoofing|corsattack|alta",
+            "threat": {
+              "category": "Spoofing",
+              "component": "CORS Attack",
+              "description": "Critical CORS vulnerability. Server allows requests from ANY origin (*). This enables cross-site attacks and data theft.",
+              "evidence": "Response contains 'Access-Control-Allow-Origin: *'",
+              "severity": "Alta",
+              "mitigation": "Restrict CORS to specific trusted origins.",
+              "confirmed": null,
+              "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+              "dynamic_validation": null
+            }
+          },
+          {
+            "id": "spoofing|jwttokenattack|alta",
+            "threat": {
+              "category": "Spoofing",
+              "component": "JWT Token Attack",
+              "description": "JWT token validation vulnerability. Tampered token accepted. Signature not properly verified.",
+              "evidence": "Tampered token accepted without proper validation.",
+              "severity": "Alta",
+              "mitigation": "Ensure proper signature verification for JWT tokens.",
+              "confirmed": null,
+              "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+              "dynamic_validation": null
+            }
+          },
+          {
+            "id": "tampering|sqlinjectionattack|alta",
+            "threat": {
+              "category": "Tampering",
+              "component": "SQL Injection Attack",
+              "description": "SQL injection successful using payload. Response indicates successful authentication.",
+              "evidence": "Response contains 'success' or 'token' after injection payload.",
+              "severity": "Alta",
+              "mitigation": "Use prepared statements and parameterized queries to prevent SQL injection.",
+              "confirmed": true,
+              "confirmation_reason": null,
+              "dynamic_validation": {
+                "attack": "SQL Injection",
+                "evidence": "Detected payload reflection",
+                "response_code": 200
+              }
+            }
+          },
+          {
+            "id": "tampering|xssattack|alta",
+            "threat": {
+              "category": "Tampering",
+              "component": "XSS Attack",
+              "description": "XSS vulnerability detected. Payload reflected in response without proper encoding.",
+              "evidence": "Payload '<script>alert('XSS')</script>' reflected in response.",
+              "severity": "Alta",
+              "mitigation": "Sanitize and encode user inputs to prevent XSS.",
+              "confirmed": true,
+              "confirmation_reason": null,
+              "dynamic_validation": {
+                "attack": "SQL Injection",
+                "evidence": "Detected payload reflection",
+                "response_code": 200
+              }
+            }
+          },
+          {
+            "id": "informationdisclosure|pathtraversalattack|alta",
+            "threat": {
+              "category": "InformationDisclosure",
+              "component": "Path Traversal Attack",
+              "description": "Path traversal vulnerability detected. System files accessible.",
+              "evidence": "Response contains sensitive file content.",
+              "severity": "Alta",
+              "mitigation": "Validate and sanitize file paths to prevent path traversal.",
+              "confirmed": null,
+              "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+              "dynamic_validation": null
+            }
+          },
+          {
+            "id": "elevationofprivilege|weakpasswordattack|alta",
+            "threat": {
+              "category": "ElevationOfPrivilege",
+              "component": "Weak Password Attack",
+              "description": "Weak password policy detected. Weak passwords accepted.",
+              "evidence": "Accepted weak password: '123456'.",
+              "severity": "Alta",
+              "mitigation": "Enforce strong password policies requiring complexity.",
+              "confirmed": null,
+              "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+              "dynamic_validation": null
+            }
+          }
+        ],
+        "fp": [
+          {
+            "id": "spoofing|sessionfixationattack|media",
+            "threat": {
+              "category": "Spoofing",
+              "component": "Session Fixation Attack",
+              "description": "Session fixation vulnerability detected. Session ID not regenerated after authentication.",
+              "evidence": "Same session ID used before and after login.",
+              "severity": "Media",
+              "mitigation": "Regenerate session ID upon successful login.",
+              "confirmed": null,
+              "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+              "dynamic_validation": null
+            }
+          },
+          {
+            "id": "informationdisclosure|infoleakattack|baja",
+            "threat": {
+              "category": "InformationDisclosure",
+              "component": "Info Leak Attack",
+              "description": "Information leakage detected. Different responses allow user enumeration.",
+              "evidence": "Invalid user response differs from valid user response.",
+              "severity": "Baja",
+              "mitigation": "Ensure consistent responses for valid and invalid usernames.",
+              "confirmed": null,
+              "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+              "dynamic_validation": null
+            }
+          },
+          {
+            "id": "informationdisclosure|insecurehttpheadersattack|media",
+            "threat": {
+              "category": "InformationDisclosure",
+              "component": "Insecure HTTP Headers Attack",
+              "description": "Missing security headers increase risk of attacks.",
+              "evidence": "Missing headers: X-Frame-Options, X-Content-Type-Options, etc.",
+              "severity": "Media",
+              "mitigation": "Implement essential security headers in HTTP responses.",
+              "confirmed": null,
+              "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+              "dynamic_validation": null
+            }
+          },
+          {
+            "id": "denialofservice|bruteforceattack|baja",
+            "threat": {
+              "category": "DenialOfService",
+              "component": "Brute Force Attack",
+              "description": "Rate limiting detected. Blocked after multiple attempts.",
+              "evidence": "Response indicates rate limiting after several login attempts.",
+              "severity": "Baja",
+              "mitigation": "Implement account lockout mechanisms and rate limiting.",
+              "confirmed": null,
+              "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+              "dynamic_validation": null
+            }
+          }
+        ],
+        "fn": [
+          {
+            "id": "repudiation|auditlogtampering|media",
+            "threat": {
+              "category": "Repudiation",
+              "component": "Audit Log Tampering",
+              "description": "Application lacks immutable audit logging; actions can be performed without a traceable record.",
+              "severity": "Media",
+              "mitigation": "Implement tamper-evident, append-only audit logs with timestamps and user context."
+            }
+          },
+          {
+            "id": "informationdisclosure|hardcodedcredentials|alta",
+            "threat": {
+              "category": "InformationDisclosure",
+              "component": "Hardcoded Credentials",
+              "description": "Database passwords and API keys are stored in plaintext within configuration files.",
+              "severity": "Alta",
+              "mitigation": "Move secrets to environment variables or a secrets manager."
+            }
+          }
+        ]
+      }
+    },
+    "secure": {
+      "counts": {
+        "TP": 1,
+        "FP": 9,
+        "FN": 0
+      },
+      "precision": 0.1,
+      "recall": 1,
+      "f1": 0.1818,
+      "strideCoverage": 1,
+      "bySeverity": {
+        "Alta": {
+          "TP": 0,
+          "FP": 6,
+          "FN": 0
+        },
+        "Media": {
+          "TP": 0,
+          "FP": 2,
+          "FN": 0
+        },
+        "Baja": {
+          "TP": 1,
+          "FP": 1,
+          "FN": 0
+        }
+      },
+      "byCategory": {
+        "Spoofing": {
+          "TP": 0,
+          "FP": 3,
+          "FN": 0
+        },
+        "Tampering": {
+          "TP": 0,
+          "FP": 2,
+          "FN": 0
+        },
+        "Repudiation": {
+          "TP": 0,
+          "FP": 0,
+          "FN": 0
+        },
+        "InformationDisclosure": {
+          "TP": 1,
+          "FP": 2,
+          "FN": 0
+        },
+        "DenialOfService": {
+          "TP": 0,
+          "FP": 1,
+          "FN": 0
+        },
+        "ElevationOfPrivilege": {
+          "TP": 0,
+          "FP": 1,
+          "FN": 0
+        }
+      },
+      "details": {
+        "tp": [
+          {
+            "id": "informationdisclosure|infoleakattack|baja",
+            "threat": {
+              "category": "InformationDisclosure",
+              "component": "Info Leak Attack",
+              "description": "Information leakage detected. Different responses allow user enumeration.",
+              "evidence": "Invalid user response differs from valid user response.",
+              "severity": "Baja",
+              "mitigation": "Ensure consistent responses for valid and invalid usernames.",
+              "confirmed": null,
+              "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+              "dynamic_validation": null
+            }
+          }
+        ],
+        "fp": [
+          {
+            "id": "spoofing|corsattack|alta",
+            "threat": {
+              "category": "Spoofing",
+              "component": "CORS Attack",
+              "description": "Critical CORS vulnerability. Server allows requests from ANY origin (*). This enables cross-site attacks and data theft.",
+              "evidence": "Response contains 'Access-Control-Allow-Origin: *'",
+              "severity": "Alta",
+              "mitigation": "Restrict CORS to specific trusted origins.",
+              "confirmed": null,
+              "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+              "dynamic_validation": null
+            }
+          },
+          {
+            "id": "spoofing|jwttokenattack|alta",
+            "threat": {
+              "category": "Spoofing",
+              "component": "JWT Token Attack",
+              "description": "JWT token validation vulnerability. Tampered token accepted. Signature not properly verified.",
+              "evidence": "Tampered token accepted without proper validation.",
+              "severity": "Alta",
+              "mitigation": "Ensure proper signature verification for JWT tokens.",
+              "confirmed": null,
+              "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+              "dynamic_validation": null
+            }
+          },
+          {
+            "id": "spoofing|sessionfixationattack|media",
+            "threat": {
+              "category": "Spoofing",
+              "component": "Session Fixation Attack",
+              "description": "Session fixation vulnerability detected. Session ID not regenerated after authentication.",
+              "evidence": "Same session ID used before and after login.",
+              "severity": "Media",
+              "mitigation": "Regenerate session ID upon successful login.",
+              "confirmed": null,
+              "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+              "dynamic_validation": null
+            }
+          },
+          {
+            "id": "tampering|sqlinjectionattack|alta",
+            "threat": {
+              "category": "Tampering",
+              "component": "SQL Injection Attack",
+              "description": "SQL injection successful using payload. Response indicates successful authentication.",
+              "evidence": "Response contains 'success' or 'token' after injection payload.",
+              "severity": "Alta",
+              "mitigation": "Use prepared statements and parameterized queries to prevent SQL injection.",
+              "confirmed": true,
+              "confirmation_reason": null,
+              "dynamic_validation": {
+                "attack": "SQL Injection",
+                "evidence": "Detected payload reflection",
+                "response_code": 200
+              }
+            }
+          },
+          {
+            "id": "tampering|xssattack|alta",
+            "threat": {
+              "category": "Tampering",
+              "component": "XSS Attack",
+              "description": "XSS vulnerability detected. Payload reflected in response without proper encoding.",
+              "evidence": "Payload '<script>alert('XSS')</script>' reflected in response.",
+              "severity": "Alta",
+              "mitigation": "Sanitize and encode user inputs to prevent XSS.",
+              "confirmed": true,
+              "confirmation_reason": null,
+              "dynamic_validation": {
+                "attack": "SQL Injection",
+                "evidence": "Detected payload reflection",
+                "response_code": 200
+              }
+            }
+          },
+          {
+            "id": "informationdisclosure|insecurehttpheadersattack|media",
+            "threat": {
+              "category": "InformationDisclosure",
+              "component": "Insecure HTTP Headers Attack",
+              "description": "Missing security headers increase risk of attacks.",
+              "evidence": "Missing headers: X-Frame-Options, X-Content-Type-Options, etc.",
+              "severity": "Media",
+              "mitigation": "Implement essential security headers in HTTP responses.",
+              "confirmed": null,
+              "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+              "dynamic_validation": null
+            }
+          },
+          {
+            "id": "informationdisclosure|pathtraversalattack|alta",
+            "threat": {
+              "category": "InformationDisclosure",
+              "component": "Path Traversal Attack",
+              "description": "Path traversal vulnerability detected. System files accessible.",
+              "evidence": "Response contains sensitive file content.",
+              "severity": "Alta",
+              "mitigation": "Validate and sanitize file paths to prevent path traversal.",
+              "confirmed": null,
+              "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+              "dynamic_validation": null
+            }
+          },
+          {
+            "id": "denialofservice|bruteforceattack|baja",
+            "threat": {
+              "category": "DenialOfService",
+              "component": "Brute Force Attack",
+              "description": "Rate limiting detected. Blocked after multiple attempts.",
+              "evidence": "Response indicates rate limiting after several login attempts.",
+              "severity": "Baja",
+              "mitigation": "Implement account lockout mechanisms and rate limiting.",
+              "confirmed": null,
+              "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+              "dynamic_validation": null
+            }
+          },
+          {
+            "id": "elevationofprivilege|weakpasswordattack|alta",
+            "threat": {
+              "category": "ElevationOfPrivilege",
+              "component": "Weak Password Attack",
+              "description": "Weak password policy detected. Weak passwords accepted.",
+              "evidence": "Accepted weak password: '123456'.",
+              "severity": "Alta",
+              "mitigation": "Enforce strong password policies requiring complexity.",
+              "confirmed": null,
+              "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
+              "dynamic_validation": null
+            }
+          }
+        ],
+        "fn": []
+      }
+    }
+  }
+}
