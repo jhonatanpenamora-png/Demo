@@ -9,6 +9,8 @@ const BLUE = '\x1b[34m';
 const BOLD = '\x1b[1m';
 const NC = '\x1b[0m';
 
+const EMPTY_THREATS = { Spoofing: [], Tampering: [], Repudiation: [], InformationDisclosure: [], DenialOfService: [], ElevationOfPrivilege: [] };
+
 // --- 1. Environment Handling ---
 function loadEnv() {
     const envPath = path.resolve(__dirname, '../.env');
@@ -123,10 +125,16 @@ function formatReport(input) {
 // --- Main ---
 async function run() {
     const diff = await readStdin();
-    if (!diff.trim()) return;
+    if (!diff.trim()) {
+        const outputPath = path.resolve(process.cwd(), 'threats-output.json');
+        fs.writeFileSync(outputPath, JSON.stringify({ summary: "No diff detected.", threats: EMPTY_THREATS }, null, 2));
+        return;
+    }
 
     if (!API_KEY || !ENDPOINT || !DEPLOYMENT) {
         console.log(YELLOW + "Advertencia: Configuración de IA incompleta en .env. Omitiendo análisis." + NC);
+        const outputPath = path.resolve(process.cwd(), 'threats-output.json');
+        fs.writeFileSync(outputPath, JSON.stringify({ summary: "Analysis skipped: AI configuration missing.", threats: EMPTY_THREATS }, null, 2));
         process.exit(0);
     }
 
@@ -151,6 +159,9 @@ async function run() {
         const result = await response.json();
         const content = JSON.parse(result.choices[0].message.content);
         
+        const outputPath = path.resolve(process.cwd(), 'threats-output.json');
+        fs.writeFileSync(outputPath, JSON.stringify(content, null, 2));
+
         const exitCode = formatReport(content);
         process.exit(exitCode);
 

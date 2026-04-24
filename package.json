@@ -1,0 +1,10 @@
+{
+  "name": "demo-security",
+  "version": "1.0.0",
+  "description": "STRIDE threat analysis pipeline with CI/CD baseline management",
+  "scripts": {
+    "analyze-stride": "git diff HEAD~1 HEAD | node Attack-Simulation-FDSI/diff-analyzer/index.js",
+    "check-baseline": "node check-baseline.js",
+    "update-baseline": "node check-baseline.js --update"
+  }
+}
