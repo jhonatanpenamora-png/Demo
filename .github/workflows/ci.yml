@@ -1,0 +1,70 @@
+name: STRIDE Threat Analysis
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  stride-analysis:
+    name: STRIDE Analysis & Baseline Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      # ── 1. Checkout with enough history to diff against the previous commit ──
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      # ── 2. Setup Node.js ──
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # ── 3. Compute git diff ──
+      - name: Get git diff
+        id: diff
+        run: |
+          # For the very first commit on a branch, HEAD~1 may not exist.
+          if git rev-parse HEAD~1 > /dev/null 2>&1; then
+            git diff HEAD~1 HEAD > /tmp/changes.diff
+          else
+            git diff --root HEAD > /tmp/changes.diff
+          fi
+          echo "Diff size: $(wc -c < /tmp/changes.diff) bytes"
+
+      # ── 4. Run STRIDE analysis ──
+      - name: Run STRIDE analysis
+        id: stride
+        env:
+          AZURE_OPENAI_API_KEY:   ${{ secrets.AZURE_OPENAI_API_KEY }}
+          AZURE_OPENAI_ENDPOINT:  ${{ secrets.AZURE_OPENAI_ENDPOINT }}
+          AZURE_DEPLOYMENT_NAME:  ${{ secrets.AZURE_DEPLOYMENT_NAME }}
+        run: |
+          # Write a .env file if secrets are available so the diff-analyzer can pick them up
+          if [ -n "$AZURE_OPENAI_API_KEY" ] && [ -n "$AZURE_OPENAI_ENDPOINT" ] && [ -n "$AZURE_DEPLOYMENT_NAME" ]; then
+            printf 'AZURE_OPENAI_API_KEY=%s\nAZURE_OPENAI_ENDPOINT=%s\nAZURE_DEPLOYMENT_NAME=%s\n' \
+              "$AZURE_OPENAI_API_KEY" "$AZURE_OPENAI_ENDPOINT" "$AZURE_DEPLOYMENT_NAME" \
+              > Attack-Simulation-FDSI/.env
+          fi
+
+          # Pipe the diff into the analyzer (exits 0 even if analysis is skipped)
+          cat /tmp/changes.diff | node Attack-Simulation-FDSI/diff-analyzer/index.js || true
+
+      # ── 5. Compare against baseline ──
+      - name: Check against security baseline
+        run: node check-baseline.js
+
+      # ── 6. Upload threats-output.json as artifact (always, even on failure) ──
+      - name: Upload threat report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: threats-output
+          path: threats-output.json
+          if-no-files-found: warn
