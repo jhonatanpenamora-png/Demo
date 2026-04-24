@@ -1,11 +1,22 @@
 {
-  "timestamp": "2026-04-23T18:23:19.916Z",
+  "timestamp": "2026-04-24T01:14:53.952Z",
   "executive_summary": {
     "total_detected": 10,
     "total_confirmed": 2,
-    "total_unconfirmed": 0,
+    "total_unconfirmed": 8,
+    "total_alta": 6,
+    "total_media": 2,
+    "total_baja": 2,
     "confirmation_rate_percent": 20,
     "system_status": "available"
+  },
+  "cicd": {
+    "last_run": "2026-04-24T01:14:53.952Z",
+    "status": "success",
+    "workflow": "CI Security Analysis",
+    "run_url": "https://github.com/jhonatanpenamora-png/Demo/actions",
+    "artifact": "threats-output.json",
+    "branch": "main"
   },
   "stride_analysis": {
     "Spoofing": [
@@ -30,7 +41,7 @@
         "component": "Session Fixation Attack",
         "description": "Session fixation vulnerability detected. Session ID not regenerated after authentication.",
         "evidence": "Same session ID used before and after login.",
-        "severity": "Alta",
+        "severity": "Media",
         "mitigation": "Regenerate session ID upon successful login."
       }
     ],
@@ -58,7 +69,7 @@
         "component": "Info Leak Attack",
         "description": "Information leakage detected. Different responses allow user enumeration.",
         "evidence": "Invalid user response differs from valid user response.",
-        "severity": "Media",
+        "severity": "Baja",
         "mitigation": "Ensure consistent responses for valid and invalid usernames."
       },
       {
@@ -84,7 +95,7 @@
         "component": "Brute Force Attack",
         "description": "Rate limiting detected. Blocked after multiple attempts.",
         "evidence": "Response indicates rate limiting after several login attempts.",
-        "severity": "Media",
+        "severity": "Baja",
         "mitigation": "Implement account lockout mechanisms and rate limiting."
       }
     ],
@@ -136,7 +147,7 @@
       "component": "Session Fixation Attack",
       "description": "Session fixation vulnerability detected. Session ID not regenerated after authentication.",
       "evidence": "Same session ID used before and after login.",
-      "severity": "Alta",
+      "severity": "Media",
       "mitigation": "Regenerate session ID upon successful login.",
       "confirmed": null,
       "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
@@ -177,7 +188,7 @@
       "component": "Info Leak Attack",
       "description": "Information leakage detected. Different responses allow user enumeration.",
       "evidence": "Invalid user response differs from valid user response.",
-      "severity": "Media",
+      "severity": "Baja",
       "mitigation": "Ensure consistent responses for valid and invalid usernames.",
       "confirmed": null,
       "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
@@ -210,7 +221,7 @@
       "component": "Brute Force Attack",
       "description": "Rate limiting detected. Blocked after multiple attempts.",
       "evidence": "Response indicates rate limiting after several login attempts.",
-      "severity": "Media",
+      "severity": "Baja",
       "mitigation": "Implement account lockout mechanisms and rate limiting.",
       "confirmed": null,
       "confirmation_reason": "no_dynamic_attack_mapped_or_executed",
