@@ -1,0 +1,64 @@
+{
+  "scenario": "insecure",
+  "description": "Manual STRIDE analysis of an intentionally insecure REST API application. Performed by a security analyst reviewing the application architecture, source code, and live traffic.",
+  "analyst": "Security Analyst",
+  "date": "2026-04-24",
+  "threats": [
+    {
+      "category": "Spoofing",
+      "component": "CORS Attack",
+      "description": "Server allows requests from ANY origin (*), enabling cross-site attacks and data theft.",
+      "severity": "Alta",
+      "mitigation": "Restrict CORS to specific trusted origins."
+    },
+    {
+      "category": "Spoofing",
+      "component": "JWT Token Attack",
+      "description": "JWT signature not properly verified; tampered tokens are accepted by the server.",
+      "severity": "Alta",
+      "mitigation": "Enforce strict JWT signature verification using a secure algorithm."
+    },
+    {
+      "category": "Tampering",
+      "component": "SQL Injection Attack",
+      "description": "Unsanitized user input passed directly into SQL queries allows injection attacks.",
+      "severity": "Alta",
+      "mitigation": "Use parameterized queries and prepared statements."
+    },
+    {
+      "category": "Tampering",
+      "component": "XSS Attack",
+      "description": "User-supplied input is reflected in responses without encoding, enabling script injection.",
+      "severity": "Alta",
+      "mitigation": "Sanitize and encode all user inputs; apply Content-Security-Policy."
+    },
+    {
+      "category": "Repudiation",
+      "component": "Audit Log Tampering",
+      "description": "Application lacks immutable audit logging; actions can be performed without a traceable record.",
+      "severity": "Media",
+      "mitigation": "Implement tamper-evident, append-only audit logs with timestamps and user context."
+    },
+    {
+      "category": "InformationDisclosure",
+      "component": "Path Traversal Attack",
+      "description": "Insufficient path validation allows attackers to read arbitrary files from the filesystem.",
+      "severity": "Alta",
+      "mitigation": "Validate and canonicalize file paths; restrict access to a safe root directory."
+    },
+    {
+      "category": "InformationDisclosure",
+      "component": "Hardcoded Credentials",
+      "description": "Database passwords and API keys are stored in plaintext within configuration files.",
+      "severity": "Alta",
+      "mitigation": "Move secrets to environment variables or a secrets manager."
+    },
+    {
+      "category": "ElevationOfPrivilege",
+      "component": "Weak Password Attack",
+      "description": "Application accepts trivially weak passwords (e.g., '123456'), exposing accounts to brute-force.",
+      "severity": "Alta",
+      "mitigation": "Enforce strong password policies requiring length, complexity, and uniqueness."
+    }
+  ]
+}
