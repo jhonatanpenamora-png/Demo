@@ -1,429 +1,800 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attack Simulation Dashboard</title>
+    <title>🛡️ STRIDE Security Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg-primary: #0f0f1e;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #16213e;
+            --bg-hover: #1f2b4a;
+            --border: #2d2d44;
+            --border-light: #3d3d5e;
+            --text-primary: #e0e0f0;
+            --text-secondary: #9090b0;
+            --text-muted: #606080;
+            --alta: #f87171;
+            --alta-bg: rgba(248,113,113,0.12);
+            --alta-border: rgba(248,113,113,0.4);
+            --media: #fbbf24;
+            --media-bg: rgba(251,191,36,0.12);
+            --media-border: rgba(251,191,36,0.4);
+            --baja: #4ade80;
+            --baja-bg: rgba(74,222,128,0.12);
+            --baja-border: rgba(74,222,128,0.4);
+            --info: #60a5fa;
+            --info-bg: rgba(96,165,250,0.12);
+            --purple: #a78bfa;
+            --purple-bg: rgba(167,139,250,0.12);
         }
-
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg-primary: #f0f2f8;
+                --bg-secondary: #ffffff;
+                --bg-card: #ffffff;
+                --bg-hover: #f5f7ff;
+                --border: #dde2f0;
+                --border-light: #c8d0e8;
+                --text-primary: #1a1a2e;
+                --text-secondary: #4a4a6a;
+                --text-muted: #7a7a9a;
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0f0f1e;
-            color: #e0e0e0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             padding: 20px;
             min-height: 100vh;
+            line-height: 1.5;
         }
+        .container { max-width: 1280px; margin: 0 auto; }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
+        /* Header */
         header {
-            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 28px;
             padding-bottom: 20px;
-            border-bottom: 1px solid #2d2d44;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 12px;
         }
-
-        h1 {
-            font-size: 2em;
-            color: #ffffff;
-            margin-bottom: 8px;
+        .header-title h1 { font-size: 1.8em; color: var(--text-primary); margin-bottom: 4px; }
+        .header-title .subtitle { color: var(--text-secondary); font-size: 0.9em; }
+        .header-meta { text-align: right; }
+        .timestamp { color: var(--text-muted); font-size: 0.82em; margin-top: 6px; }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.82em;
+            font-weight: 600;
+            letter-spacing: 0.5px;
         }
+        .status-badge.critico { background: var(--alta-bg); color: var(--alta); border: 1px solid var(--alta-border); }
+        .status-badge.riesgo { background: var(--media-bg); color: var(--media); border: 1px solid var(--media-border); }
+        .status-badge.seguro { background: var(--baja-bg); color: var(--baja); border: 1px solid var(--baja-border); }
 
-        .subtitle {
-            color: #888;
-            font-size: 0.95em;
-        }
-
-        .timestamp {
-            color: #666;
-            font-size: 0.85em;
-            margin-top: 10px;
-        }
-
+        /* Controls */
         .controls {
             display: flex;
-            gap: 12px;
-            margin-bottom: 30px;
+            gap: 10px;
+            margin-bottom: 24px;
             flex-wrap: wrap;
+            align-items: center;
         }
-
-        button {
-            background: #2d2d44;
-            color: #e0e0e0;
-            border: 1px solid #3d3d54;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 9px 14px;
+            color: var(--text-primary);
             font-size: 0.9em;
-            transition: all 0.2s ease;
+            outline: none;
+            transition: border-color 0.2s;
         }
-
-        button:hover {
-            background: #3d3d54;
-            border-color: #4d4d64;
+        .search-box:focus { border-color: var(--info); }
+        .search-box::placeholder { color: var(--text-muted); }
+        .filter-group { display: flex; gap: 6px; flex-wrap: wrap; }
+        .filter-btn {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 500;
+            transition: all 0.2s;
+            white-space: nowrap;
         }
-
-        button:active {
-            transform: translateY(1px);
+        .filter-btn:hover { background: var(--bg-hover); border-color: var(--border-light); }
+        .filter-btn.active-all { background: var(--info-bg); color: var(--info); border-color: var(--info); }
+        .filter-btn.active-alta { background: var(--alta-bg); color: var(--alta); border-color: var(--alta-border); }
+        .filter-btn.active-media { background: var(--media-bg); color: var(--media); border-color: var(--media-border); }
+        .filter-btn.active-baja { background: var(--baja-bg); color: var(--baja); border-color: var(--baja-border); }
+        .export-btn {
+            background: var(--purple-bg);
+            color: var(--purple);
+            border: 1px solid rgba(167,139,250,0.4);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 500;
+            transition: all 0.2s;
         }
+        .export-btn:hover { background: rgba(167,139,250,0.2); }
 
-        .stats-grid {
+        /* Summary Grid */
+        .summary-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
         }
-
         .stat-card {
-            background: #1a1a2e;
-            border: 1px solid #2d2d44;
-            border-radius: 4px;
-            padding: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px 20px;
+            transition: border-color 0.2s, transform 0.2s;
         }
-
+        .stat-card:hover { border-color: var(--border-light); transform: translateY(-2px); }
         .stat-label {
-            font-size: 0.85em;
-            color: #888;
+            font-size: 0.78em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
             margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
-
         .stat-value {
-            font-size: 2em;
-            font-weight: 600;
-            margin-bottom: 5px;
+            font-size: 2.2em;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 4px;
         }
+        .stat-sub { font-size: 0.78em; color: var(--text-muted); }
+        .stat-value.total { color: var(--info); }
+        .stat-value.alta { color: var(--alta); }
+        .stat-value.media { color: var(--media); }
+        .stat-value.baja { color: var(--baja); }
+        .stat-value.rate { color: var(--purple); }
 
-        .stat-value.secure {
-            color: #4ade80;
+        /* Two-column layout */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
         }
+        @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
 
-        .stat-value.vulnerable {
-            color: #f87171;
+        /* Panels */
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
         }
-
-        .stat-value.neutral {
-            color: #60a5fa;
-        }
-
-        .system-card {
-            background: #1a1a2e;
-            border: 1px solid #2d2d44;
-            border-radius: 4px;
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-
-        .system-header {
+        .panel-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #2d2d44;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
         }
-
-        .system-title {
-            font-size: 1.3em;
-            font-weight: 600;
-            color: #fff;
-        }
-
-        .system-url {
-            color: #888;
-            font-size: 0.85em;
-            margin-top: 4px;
-        }
-
-        .system-status {
-            padding: 6px 16px;
-            border-radius: 3px;
-            font-weight: 500;
-            font-size: 0.85em;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .system-status.secure {
-            background: rgba(74, 222, 128, 0.15);
-            color: #4ade80;
-            border: 1px solid #4ade80;
-        }
-
-        .system-status.vulnerable {
-            background: rgba(248, 113, 113, 0.15);
-            color: #f87171;
-            border: 1px solid #f87171;
-        }
-
-        .attack-result {
-            background: #141420;
-            border-left: 3px solid #2d2d44;
-            border-radius: 3px;
-            padding: 16px;
-            margin-bottom: 12px;
-        }
-
-        .attack-result.secure {
-            border-left-color: #4ade80;
-        }
-
-        .attack-result.vulnerable {
-            border-left-color: #f87171;
-        }
-
-        .attack-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .attack-name {
+        .panel-title {
             font-size: 1em;
-            font-weight: 500;
-            color: #fff;
+            font-weight: 600;
+            color: var(--text-primary);
         }
-
-        .attack-status {
+        .panel-badge {
+            font-size: 0.75em;
             padding: 3px 10px;
-            border-radius: 2px;
-            font-size: 0.8em;
+            border-radius: 12px;
             font-weight: 500;
-            letter-spacing: 0.3px;
+        }
+        .panel-body { padding: 20px; }
+
+        /* Radar chart */
+        .chart-container {
+            position: relative;
+            height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .attack-status.secure {
-            background: rgba(74, 222, 128, 0.15);
-            color: #4ade80;
+        /* CI/CD Panel */
+        .cicd-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .cicd-item:last-child { border-bottom: none; }
+        .cicd-label { font-size: 0.82em; color: var(--text-secondary); }
+        .cicd-value { font-size: 0.88em; font-weight: 500; color: var(--text-primary); }
+        .cicd-status-ok { color: var(--baja); font-weight: 600; }
+        .cicd-status-fail { color: var(--alta); font-weight: 600; }
+        .cicd-status-pending { color: var(--media); font-weight: 600; }
+        .cicd-link { color: var(--info); font-size: 0.82em; text-decoration: none; }
+        .cicd-link:hover { text-decoration: underline; }
+
+        /* Java Engine Panel */
+        .java-result {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+        .java-result:last-child { margin-bottom: 0; }
+        .java-attack-name { font-size: 0.9em; font-weight: 500; }
+        .java-badge {
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+        .java-badge.vuln { background: var(--alta-bg); color: var(--alta); border: 1px solid var(--alta-border); }
+        .java-badge.safe { background: var(--baja-bg); color: var(--baja); border: 1px solid var(--baja-border); }
+
+        /* Threats Table */
+        .threats-section { margin-bottom: 24px; }
+        .threat-count {
+            font-size: 0.82em;
+            color: var(--text-muted);
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
+        }
+        .threat-row {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+            cursor: pointer;
+        }
+        .threat-row:last-child { border-bottom: none; }
+        .threat-row:hover { background: var(--bg-hover); }
+        .threat-main {
+            display: grid;
+            grid-template-columns: 130px 1fr 90px 100px 110px;
+            gap: 12px;
+            align-items: center;
+            padding: 14px 20px;
+        }
+        @media (max-width: 700px) {
+            .threat-main { grid-template-columns: 1fr 1fr; }
+            .threat-component, .threat-status { display: none; }
+        }
+        .threat-category-tag {
+            font-size: 0.75em;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 12px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .cat-spoofing { background: rgba(167,139,250,0.15); color: var(--purple); border: 1px solid rgba(167,139,250,0.3); }
+        .cat-tampering { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+        .cat-repudiation { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
+        .cat-information { background: rgba(96,165,250,0.15); color: var(--info); border: 1px solid rgba(96,165,250,0.3); }
+        .cat-denial { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+        .cat-elevation { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.3); }
+        .threat-component { font-size: 0.88em; font-weight: 500; color: var(--text-primary); }
+        .threat-desc { font-size: 0.82em; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sev-badge {
+            font-size: 0.75em;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .sev-alta { background: var(--alta-bg); color: var(--alta); border: 1px solid var(--alta-border); }
+        .sev-media { background: var(--media-bg); color: var(--media); border: 1px solid var(--media-border); }
+        .sev-baja { background: var(--baja-bg); color: var(--baja); border: 1px solid var(--baja-border); }
+        .threat-status { font-size: 0.8em; }
+        .confirmed-yes { color: var(--baja); }
+        .confirmed-no { color: var(--text-muted); }
+        .expand-icon { font-size: 0.75em; color: var(--text-muted); text-align: right; }
+
+        /* Expanded details */
+        .threat-details {
+            display: none;
+            padding: 0 20px 16px 20px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+        }
+        .threat-details.open { display: block; }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            padding-top: 14px;
+        }
+        .detail-item { }
+        .detail-label {
+            font-size: 0.72em;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .detail-value {
+            font-size: 0.84em;
+            color: var(--text-secondary);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 8px 10px;
         }
 
-        .attack-status.vulnerable {
-            background: rgba(248, 113, 113, 0.15);
-            color: #f87171;
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
         }
+        .empty-state .icon { font-size: 2.5em; margin-bottom: 10px; }
 
-        .attack-details {
-            color: #aaa;
-            font-size: 0.88em;
-            line-height: 1.5;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 3px;
-            max-height: 100px;
-            overflow-y: auto;
-        }
-
-        .attack-details::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .attack-details::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
-        }
-
-        .attack-details::-webkit-scrollbar-thumb {
-            background: #3d3d54;
-            border-radius: 3px;
-        }
-
+        /* Loading */
         .loading {
             text-align: center;
             padding: 40px;
-            color: #666;
-            font-size: 1.1em;
+            color: var(--text-muted);
         }
+        .spinner {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--border);
+            border-top-color: var(--info);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 10px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .error {
-            background: rgba(248, 113, 113, 0.1);
-            border: 1px solid #f87171;
-            border-radius: 4px;
+        /* Error */
+        .error-box {
+            background: var(--alta-bg);
+            border: 1px solid var(--alta-border);
+            border-radius: 8px;
             padding: 20px;
-            color: #f87171;
+            color: var(--alta);
             text-align: center;
             margin: 20px 0;
-        }
-
-        .info-box {
-            background: rgba(96, 165, 250, 0.1);
-            border: 1px solid #60a5fa;
-            border-radius: 4px;
-            padding: 12px;
-            color: #60a5fa;
-            margin-bottom: 20px;
-            font-size: 0.88em;
-        }
-
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 1.5em;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Attack Simulation Dashboard</h1>
-            <div class="subtitle">Security Testing Monitor</div>
-            <div class="timestamp" id="lastUpdate">Last updated: Never</div>
-        </header>
+<div class="container">
+    <!-- Header -->
+    <header>
+        <div class="header-title">
+            <h1>🛡️ STRIDE Security Dashboard</h1>
+            <div class="subtitle">Dashboard Unificado de Seguridad · Attack-Simulation-FDSI</div>
+        </div>
+        <div class="header-meta">
+            <div id="globalStatus" class="status-badge critico">🔴 Cargando...</div>
+            <div class="timestamp" id="reportTimestamp">Cargando datos...</div>
+        </div>
+    </header>
 
-        <div class="controls">
-            <button onclick="loadResults()">Refresh Data</button>
-            <button onclick="toggleAutoRefresh()">Auto-Refresh: <span id="autoRefreshStatus">OFF</span></button>
-            <button onclick="clearData()">Clear Display</button>
+    <!-- Controls -->
+    <div class="controls">
+        <input type="text" class="search-box" id="searchInput" placeholder="🔍 Buscar por componente, descripción o categoría..." oninput="applyFilters()">
+        <div class="filter-group">
+            <button class="filter-btn active-all" id="btn-all" onclick="setFilter('all')">Todas</button>
+            <button class="filter-btn" id="btn-alta" onclick="setFilter('alta')">🔴 Alta</button>
+            <button class="filter-btn" id="btn-media" onclick="setFilter('media')">🟡 Media</button>
+            <button class="filter-btn" id="btn-baja" onclick="setFilter('baja')">🟢 Baja</button>
+        </div>
+        <button class="export-btn" onclick="exportJSON()">⬇ Exportar JSON</button>
+    </div>
+
+    <!-- Summary Grid -->
+    <div class="summary-grid" id="summaryGrid">
+        <div class="stat-card"><div class="stat-label">Total Amenazas</div><div class="stat-value total" id="s-total">—</div><div class="stat-sub">detectadas</div></div>
+        <div class="stat-card"><div class="stat-label">Severidad Alta</div><div class="stat-value alta" id="s-alta">—</div><div class="stat-sub">críticas</div></div>
+        <div class="stat-card"><div class="stat-label">Severidad Media</div><div class="stat-value media" id="s-media">—</div><div class="stat-sub">moderadas</div></div>
+        <div class="stat-card"><div class="stat-label">Severidad Baja</div><div class="stat-value baja" id="s-baja">—</div><div class="stat-sub">menores</div></div>
+        <div class="stat-card"><div class="stat-label">Tasa Confirmación</div><div class="stat-value rate" id="s-rate">—</div><div class="stat-sub">motor Java</div></div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="two-col">
+        <!-- Radar STRIDE -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">📊 Análisis STRIDE</div>
+                <span class="panel-badge" style="background:var(--purple-bg);color:var(--purple);">Radar Chart</span>
+            </div>
+            <div class="panel-body">
+                <div class="chart-container">
+                    <canvas id="strideChart"></canvas>
+                </div>
+            </div>
         </div>
 
-        <div class="info-box">
-            Run AttackEngine to generate results.json, then refresh this dashboard to see the latest attack data.
-        </div>
+        <!-- Java Engine + CI/CD -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+            <!-- Java Engine -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">☕ Motor Java · Validación Dinámica</div>
+                    <span class="panel-badge" id="javaStatusBadge" style="background:var(--info-bg);color:var(--info);">...</span>
+                </div>
+                <div class="panel-body" id="javaPanel">
+                    <div class="loading"><div class="spinner"></div></div>
+                </div>
+            </div>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">Total Attacks</div>
-                <div class="stat-value neutral" id="totalAttacks">0</div>
+            <!-- CI/CD -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">🔄 Estado CI/CD</div>
+                    <span class="panel-badge" id="cicdBadge" style="background:var(--baja-bg);color:var(--baja);">GitHub Actions</span>
+                </div>
+                <div class="panel-body" id="cicdPanel">
+                    <div class="loading"><div class="spinner"></div></div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-label">Vulnerabilities</div>
-                <div class="stat-value vulnerable" id="vulnerabilitiesFound">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Passed Tests</div>
-                <div class="stat-value secure" id="passedTests">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Status</div>
-                <div class="stat-value neutral" id="overallStatus">-</div>
-            </div>
-        </div>
-
-        <div id="systemsGrid">
-            <div class="loading">Waiting for data</div>
         </div>
     </div>
 
-    <script>
-        let autoRefreshInterval = null;
-        let lastData = null;
+    <!-- Threats Table -->
+    <div class="panel threats-section">
+        <div class="panel-header">
+            <div class="panel-title">🎯 Tabla de Amenazas Detectadas</div>
+            <span class="panel-badge" id="threatCountBadge" style="background:var(--alta-bg);color:var(--alta);">Cargando...</span>
+        </div>
+        <div class="threat-count" id="threatCountInfo">Cargando amenazas...</div>
+        <div id="threatsContainer">
+            <div class="loading"><div class="spinner"></div><br>Cargando amenazas...</div>
+        </div>
+    </div>
+</div>
 
-        function loadResults() {
-            Promise.resolve({ok: true, json: () => Promise.resolve({"timestamp": "2026-03-24T18:40:04.50028599", "systems": [{"name": "Target System", "url": "http://localhost:8080", "attacks": [{"name": "SQL Injection", "vulnerable": false, "details": "No SQL injection vulnerability detected. Tested 6 payloads"}, {"name": "Brute Force", "vulnerable": true, "details": "No rate limiting. Tested 100 passwords without blocking"}, {"name": "Information Leakage", "vulnerable": false, "details": "No information leakage. Responses are consistent for both valid and invalid usernames"}]}]})})
-                .then(response => {
-                    if (!response.ok) throw new Error('No results file found');
-                    return response.json();
-                })
-                .then(data => {
-                    lastData = data;
-                    displayResults(data);
-                    updateTimestamp();
-                })
-                .catch(error => {
-                    document.getElementById('systemsGrid').innerHTML = 
-                        `<div class="error">${error.message}<br><br>Run AttackEngine to generate results.json</div>`;
-                });
-        }
+<script>
+    let allThreats = [];
+    let reportData = null;
+    let currentFilter = 'all';
+    let strideChartInstance = null;
 
-        function displayResults(data) {
-            const systemsGrid = document.getElementById('systemsGrid');
-            systemsGrid.innerHTML = '';
+    const CATEGORY_CLASS = {
+        'Spoofing': 'cat-spoofing',
+        'Tampering': 'cat-tampering',
+        'Repudiation': 'cat-repudiation',
+        'InformationDisclosure': 'cat-information',
+        'Information Disclosure': 'cat-information',
+        'DenialOfService': 'cat-denial',
+        'Denial of Service': 'cat-denial',
+        'ElevationOfPrivilege': 'cat-elevation',
+        'Elevation of Privilege': 'cat-elevation',
+    };
 
-            let totalAttacks = 0;
-            let vulnerabilitiesFound = 0;
-            let passedTests = 0;
+    const CATEGORY_LABEL = {
+        'Spoofing': 'Spoofing',
+        'Tampering': 'Tampering',
+        'Repudiation': 'Repudiation',
+        'InformationDisclosure': 'Info Disclosure',
+        'Information Disclosure': 'Info Disclosure',
+        'DenialOfService': 'DoS',
+        'Denial of Service': 'DoS',
+        'ElevationOfPrivilege': 'EoP',
+        'Elevation of Privilege': 'EoP',
+    };
 
-            data.systems.forEach(system => {
-                totalAttacks += system.attacks.length;
-                const vulnerableCount = system.attacks.filter(a => a.vulnerable).length;
-                vulnerabilitiesFound += vulnerableCount;
-                passedTests += system.attacks.length - vulnerableCount;
+    function getCategoryClass(cat) {
+        return CATEGORY_CLASS[cat] || 'cat-spoofing';
+    }
 
-                const isSecure = vulnerableCount === 0;
-                const card = document.createElement('div');
-                card.className = 'system-card';
-                card.innerHTML = `
-                    <div class="system-header">
-                        <div>
-                            <div class="system-title">${system.name}</div>
-                            <div class="system-url">${system.url}</div>
-                        </div>
-                        <div class="system-status ${isSecure ? 'secure' : 'vulnerable'}">
-                            ${isSecure ? 'SECURE' : 'VULNERABLE'}
-                        </div>
-                    </div>
-                    ${system.attacks.map(attack => `
-                        <div class="attack-result ${attack.vulnerable ? 'vulnerable' : 'secure'}">
-                            <div class="attack-header">
-                                <div class="attack-name">${attack.name}</div>
-                                <div class="attack-status ${attack.vulnerable ? 'vulnerable' : 'secure'}">
-                                    ${attack.vulnerable ? 'VULNERABLE' : 'SECURE'}
-                                </div>
-                            </div>
-                            <div class="attack-details">${attack.details}</div>
-                        </div>
-                    `).join('')}
-                `;
-                systemsGrid.appendChild(card);
+    function getCategoryLabel(cat) {
+        return CATEGORY_LABEL[cat] || cat;
+    }
+
+    function getSevClass(sev) {
+        const s = (sev || '').toLowerCase();
+        if (s === 'alta') return 'sev-alta';
+        if (s === 'media') return 'sev-media';
+        return 'sev-baja';
+    }
+
+    function formatDate(iso) {
+        if (!iso) return '—';
+        try {
+            return new Date(iso).toLocaleString();
+        } catch (e) { return iso; }
+    }
+
+    function loadData() {
+        // Datos embebidos — generado por create-standalone-dashboard.py
+        const EMBEDDED_DATA = {"timestamp": "2026-04-24T01:14:53.952Z", "executive_summary": {"total_detected": 10, "total_confirmed": 2, "total_unconfirmed": 8, "total_alta": 6, "total_media": 2, "total_baja": 2, "confirmation_rate_percent": 20, "system_status": "available"}, "cicd": {"last_run": "2026-04-24T01:14:53.952Z", "status": "success", "workflow": "CI Security Analysis", "run_url": "https://github.com/jhonatanpenamora-png/Demo/actions", "artifact": "threats-output.json", "branch": "main"}, "stride_analysis": {"Spoofing": [{"category": "Spoofing", "component": "CORS Attack", "description": "Critical CORS vulnerability. Server allows requests from ANY origin (*). This enables cross-site attacks and data theft.", "evidence": "Response contains 'Access-Control-Allow-Origin: *'", "severity": "Alta", "mitigation": "Restrict CORS to specific trusted origins."}, {"category": "Spoofing", "component": "JWT Token Attack", "description": "JWT token validation vulnerability. Tampered token accepted. Signature not properly verified.", "evidence": "Tampered token accepted without proper validation.", "severity": "Alta", "mitigation": "Ensure proper signature verification for JWT tokens."}, {"category": "Spoofing", "component": "Session Fixation Attack", "description": "Session fixation vulnerability detected. Session ID not regenerated after authentication.", "evidence": "Same session ID used before and after login.", "severity": "Media", "mitigation": "Regenerate session ID upon successful login."}], "Tampering": [{"category": "Tampering", "component": "SQL Injection Attack", "description": "SQL injection successful using payload. Response indicates successful authentication.", "evidence": "Response contains 'success' or 'token' after injection payload.", "severity": "Alta", "mitigation": "Use prepared statements and parameterized queries to prevent SQL injection."}, {"category": "Tampering", "component": "XSS Attack", "description": "XSS vulnerability detected. Payload reflected in response without proper encoding.", "evidence": "Payload '<script>alert('XSS')</script>' reflected in response.", "severity": "Alta", "mitigation": "Sanitize and encode user inputs to prevent XSS."}], "InformationDisclosure": [{"category": "Information Disclosure", "component": "Info Leak Attack", "description": "Information leakage detected. Different responses allow user enumeration.", "evidence": "Invalid user response differs from valid user response.", "severity": "Baja", "mitigation": "Ensure consistent responses for valid and invalid usernames."}, {"category": "Information Disclosure", "component": "Insecure HTTP Headers Attack", "description": "Missing security headers increase risk of attacks.", "evidence": "Missing headers: X-Frame-Options, X-Content-Type-Options, etc.", "severity": "Media", "mitigation": "Implement essential security headers in HTTP responses."}, {"category": "Information Disclosure", "component": "Path Traversal Attack", "description": "Path traversal vulnerability detected. System files accessible.", "evidence": "Response contains sensitive file content.", "severity": "Alta", "mitigation": "Validate and sanitize file paths to prevent path traversal."}], "DenialOfService": [{"category": "Denial of Service", "component": "Brute Force Attack", "description": "Rate limiting detected. Blocked after multiple attempts.", "evidence": "Response indicates rate limiting after several login attempts.", "severity": "Baja", "mitigation": "Implement account lockout mechanisms and rate limiting."}], "ElevationOfPrivilege": [{"category": "Elevation of Privilege", "component": "Weak Password Attack", "description": "Weak password policy detected. Weak passwords accepted.", "evidence": "Accepted weak password: '123456'.", "severity": "Alta", "mitigation": "Enforce strong password policies requiring complexity."}]}, "dynamic_validation": [{"attack_name": "SQL Injection", "attack_class": "SqlInjectionAttack", "vulnerable": true, "evidence": "Detected payload reflection", "response_code": 200}], "combined_threats": [{"category": "Spoofing", "component": "CORS Attack", "description": "Critical CORS vulnerability. Server allows requests from ANY origin (*). This enables cross-site attacks and data theft.", "evidence": "Response contains 'Access-Control-Allow-Origin: *'", "severity": "Alta", "mitigation": "Restrict CORS to specific trusted origins.", "confirmed": null, "confirmation_reason": "no_dynamic_attack_mapped_or_executed", "dynamic_validation": null}, {"category": "Spoofing", "component": "JWT Token Attack", "description": "JWT token validation vulnerability. Tampered token accepted. Signature not properly verified.", "evidence": "Tampered token accepted without proper validation.", "severity": "Alta", "mitigation": "Ensure proper signature verification for JWT tokens.", "confirmed": null, "confirmation_reason": "no_dynamic_attack_mapped_or_executed", "dynamic_validation": null}, {"category": "Spoofing", "component": "Session Fixation Attack", "description": "Session fixation vulnerability detected. Session ID not regenerated after authentication.", "evidence": "Same session ID used before and after login.", "severity": "Media", "mitigation": "Regenerate session ID upon successful login.", "confirmed": null, "confirmation_reason": "no_dynamic_attack_mapped_or_executed", "dynamic_validation": null}, {"category": "Tampering", "component": "SQL Injection Attack", "description": "SQL injection successful using payload. Response indicates successful authentication.", "evidence": "Response contains 'success' or 'token' after injection payload.", "severity": "Alta", "mitigation": "Use prepared statements and parameterized queries to prevent SQL injection.", "confirmed": true, "confirmation_reason": null, "dynamic_validation": {"attack": "SQL Injection", "evidence": "Detected payload reflection", "response_code": 200}}, {"category": "Tampering", "component": "XSS Attack", "description": "XSS vulnerability detected. Payload reflected in response without proper encoding.", "evidence": "Payload '<script>alert('XSS')</script>' reflected in response.", "severity": "Alta", "mitigation": "Sanitize and encode user inputs to prevent XSS.", "confirmed": true, "confirmation_reason": null, "dynamic_validation": {"attack": "SQL Injection", "evidence": "Detected payload reflection", "response_code": 200}}, {"category": "InformationDisclosure", "component": "Info Leak Attack", "description": "Information leakage detected. Different responses allow user enumeration.", "evidence": "Invalid user response differs from valid user response.", "severity": "Baja", "mitigation": "Ensure consistent responses for valid and invalid usernames.", "confirmed": null, "confirmation_reason": "no_dynamic_attack_mapped_or_executed", "dynamic_validation": null}, {"category": "InformationDisclosure", "component": "Insecure HTTP Headers Attack", "description": "Missing security headers increase risk of attacks.", "evidence": "Missing headers: X-Frame-Options, X-Content-Type-Options, etc.", "severity": "Media", "mitigation": "Implement essential security headers in HTTP responses.", "confirmed": null, "confirmation_reason": "no_dynamic_attack_mapped_or_executed", "dynamic_validation": null}, {"category": "InformationDisclosure", "component": "Path Traversal Attack", "description": "Path traversal vulnerability detected. System files accessible.", "evidence": "Response contains sensitive file content.", "severity": "Alta", "mitigation": "Validate and sanitize file paths to prevent path traversal.", "confirmed": null, "confirmation_reason": "no_dynamic_attack_mapped_or_executed", "dynamic_validation": null}, {"category": "DenialOfService", "component": "Brute Force Attack", "description": "Rate limiting detected. Blocked after multiple attempts.", "evidence": "Response indicates rate limiting after several login attempts.", "severity": "Baja", "mitigation": "Implement account lockout mechanisms and rate limiting.", "confirmed": null, "confirmation_reason": "no_dynamic_attack_mapped_or_executed", "dynamic_validation": null}, {"category": "ElevationOfPrivilege", "component": "Weak Password Attack", "description": "Weak password policy detected. Weak passwords accepted.", "evidence": "Accepted weak password: '123456'.", "severity": "Alta", "mitigation": "Enforce strong password policies requiring complexity.", "confirmed": null, "confirmation_reason": "no_dynamic_attack_mapped_or_executed", "dynamic_validation": null}]};
+        Promise.resolve(EMBEDDED_DATA)
+            .then(data => { reportData = data; renderAll(data); })
+            .catch(err => {
+                document.getElementById('threatsContainer').innerHTML =
+                    `<div class="error-box">⚠️ Error cargando datos embebidos: ${err.message}</div>`;
             });
+    }
 
-            document.getElementById('totalAttacks').textContent = totalAttacks;
-            document.getElementById('vulnerabilitiesFound').textContent = vulnerabilitiesFound;
-            document.getElementById('passedTests').textContent = passedTests;
-            
-            const overallStatus = document.getElementById('overallStatus');
-            if (vulnerabilitiesFound === 0) {
-                overallStatus.textContent = 'SECURE';
-                overallStatus.className = 'stat-value secure';
-            } else {
-                overallStatus.textContent = 'AT RISK';
-                overallStatus.className = 'stat-value vulnerable';
+    function renderAll(data) {
+        const summary = data.executive_summary || {};
+        document.getElementById('s-total').textContent = summary.total_detected ?? '—';
+        document.getElementById('s-alta').textContent = summary.total_alta ?? '—';
+        document.getElementById('s-media').textContent = summary.total_media ?? '—';
+        document.getElementById('s-baja').textContent = summary.total_baja ?? '—';
+        document.getElementById('s-rate').textContent = (summary.confirmation_rate_percent != null) ? summary.confirmation_rate_percent + '%' : '—';
+        document.getElementById('reportTimestamp').textContent = 'Reporte: ' + formatDate(data.timestamp);
+
+        // Global status
+        const alta = summary.total_alta || 0;
+        const statusEl = document.getElementById('globalStatus');
+        if (alta >= 5) {
+            statusEl.className = 'status-badge critico';
+            statusEl.textContent = '🔴 CRÍTICO';
+        } else if (alta >= 1) {
+            statusEl.className = 'status-badge riesgo';
+            statusEl.textContent = '🟡 RIESGO';
+        } else {
+            statusEl.className = 'status-badge seguro';
+            statusEl.textContent = '🟢 SEGURO';
+        }
+
+        // Threats
+        allThreats = data.combined_threats || [];
+        applyFilters();
+
+        // STRIDE chart
+        renderStrideChart(data.stride_analysis || {});
+
+        // Java engine
+        renderJavaPanel(data.dynamic_validation || []);
+
+        // CI/CD
+        renderCICDPanel(data.cicd || null);
+    }
+
+    function renderStrideChart(strideData) {
+        const categories = ['Spoofing', 'Tampering', 'InformationDisclosure', 'DenialOfService', 'ElevationOfPrivilege', 'Repudiation'];
+        const labels = ['Spoofing', 'Tampering', 'Info Disclosure', 'DoS', 'EoP', 'Repudiation'];
+        const counts = categories.map(c => (strideData[c] || []).length);
+
+        const ctx = document.getElementById('strideChart').getContext('2d');
+        if (strideChartInstance) strideChartInstance.destroy();
+
+        const maxVal = Math.max(...counts, 3) + 1;
+        const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--border') || '#2d2d44';
+
+        strideChartInstance = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Amenazas',
+                    data: counts,
+                    fill: true,
+                    backgroundColor: 'rgba(167,139,250,0.18)',
+                    borderColor: '#a78bfa',
+                    pointBackgroundColor: counts.map(v => v >= 3 ? '#f87171' : v >= 1 ? '#fbbf24' : '#4ade80'),
+                    pointBorderColor: '#fff',
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    borderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    r: {
+                        min: 0,
+                        max: maxVal,
+                        ticks: {
+                            stepSize: 1,
+                            color: '#9090b0',
+                            backdropColor: 'transparent',
+                            font: { size: 10 }
+                        },
+                        grid: { color: 'rgba(45,45,68,0.6)' },
+                        angleLines: { color: 'rgba(45,45,68,0.6)' },
+                        pointLabels: {
+                            color: '#e0e0f0',
+                            font: { size: 11, weight: '500' }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ` ${ctx.raw} amenaza${ctx.raw !== 1 ? 's' : ''}`
+                        }
+                    }
+                }
             }
-        }
-
-        function updateTimestamp() {
-            const now = new Date();
-            document.getElementById('lastUpdate').textContent = 
-                `Last updated: ${now.toLocaleTimeString()}`;
-        }
-
-        function toggleAutoRefresh() {
-            const statusEl = document.getElementById('autoRefreshStatus');
-            if (autoRefreshInterval) {
-                clearInterval(autoRefreshInterval);
-                autoRefreshInterval = null;
-                statusEl.textContent = 'OFF';
-            } else {
-                autoRefreshInterval = setInterval(loadResults, 5000);
-                statusEl.textContent = 'ON';
-                loadResults();
-            }
-        }
-
-        function clearData() {
-            document.getElementById('systemsGrid').innerHTML = 
-                '<div class="loading">Waiting for data</div>';
-            document.getElementById('totalAttacks').textContent = '0';
-            document.getElementById('vulnerabilitiesFound').textContent = '0';
-            document.getElementById('passedTests').textContent = '0';
-            document.getElementById('overallStatus').textContent = '-';
-            document.getElementById('lastUpdate').textContent = 'Last updated: Never';
-        }
-
-        window.addEventListener('load', () => {
-            setTimeout(loadResults, 500);
         });
-    </script>
+    }
+
+    function renderJavaPanel(validations) {
+        const panel = document.getElementById('javaPanel');
+        const badge = document.getElementById('javaStatusBadge');
+        if (!validations.length) {
+            panel.innerHTML = '<div class="empty-state"><div class="icon">☕</div>Sin resultados del motor Java</div>';
+            badge.textContent = 'Sin datos';
+            return;
+        }
+        const vulnCount = validations.filter(v => v.vulnerable).length;
+        badge.textContent = `${vulnCount}/${validations.length} vulnerables`;
+        if (vulnCount > 0) { badge.style.background = 'var(--alta-bg)'; badge.style.color = 'var(--alta)'; }
+
+        panel.innerHTML = validations.map(v => `
+            <div class="java-result">
+                <div>
+                    <div class="java-attack-name">${escHtml(v.attack_name || v.attack_class || 'Ataque')}</div>
+                    <div style="font-size:0.78em;color:var(--text-muted);margin-top:2px;">${escHtml(v.evidence || '')}</div>
+                </div>
+                <span class="java-badge ${v.vulnerable ? 'vuln' : 'safe'}">${v.vulnerable ? 'VULNERABLE' : 'SEGURO'}</span>
+            </div>
+        `).join('');
+    }
+
+    function renderCICDPanel(cicd) {
+        const panel = document.getElementById('cicdPanel');
+        const badge = document.getElementById('cicdBadge');
+        if (!cicd) {
+            panel.innerHTML = '<div class="empty-state"><div class="icon">🔄</div>Sin datos CI/CD</div>';
+            return;
+        }
+        const statusIcon = cicd.status === 'success' ? '✅' : cicd.status === 'failure' ? '❌' : '⏳';
+        const statusClass = cicd.status === 'success' ? 'cicd-status-ok' : cicd.status === 'failure' ? 'cicd-status-fail' : 'cicd-status-pending';
+        badge.textContent = cicd.status === 'success' ? '✅ Exitoso' : cicd.status === 'failure' ? '❌ Fallido' : '⏳ En progreso';
+
+        panel.innerHTML = `
+            <div class="cicd-item">
+                <span class="cicd-label">Estado</span>
+                <span class="cicd-value ${statusClass}">${statusIcon} ${(cicd.status || '—').toUpperCase()}</span>
+            </div>
+            <div class="cicd-item">
+                <span class="cicd-label">Workflow</span>
+                <span class="cicd-value">${escHtml(cicd.workflow || '—')}</span>
+            </div>
+            <div class="cicd-item">
+                <span class="cicd-label">Última ejecución</span>
+                <span class="cicd-value">${formatDate(cicd.last_run)}</span>
+            </div>
+            <div class="cicd-item">
+                <span class="cicd-label">Rama</span>
+                <span class="cicd-value">${escHtml(cicd.branch || '—')}</span>
+            </div>
+            <div class="cicd-item">
+                <span class="cicd-label">Artefacto</span>
+                <span class="cicd-value">${escHtml(cicd.artifact || '—')}</span>
+            </div>
+            <div class="cicd-item">
+                <span class="cicd-label">Ver pipeline</span>
+                <a class="cicd-link" href="${escHtml(cicd.run_url || '#')}" target="_blank" rel="noopener">→ GitHub Actions</a>
+            </div>
+        `;
+    }
+
+    function setFilter(f) {
+        currentFilter = f;
+        ['all','alta','media','baja'].forEach(b => {
+            const btn = document.getElementById('btn-' + b);
+            btn.className = 'filter-btn' + (b === f ? ' active-' + b : '');
+        });
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const query = (document.getElementById('searchInput').value || '').toLowerCase();
+        const filtered = allThreats.filter(t => {
+            const sev = (t.severity || '').toLowerCase();
+            const matchFilter = currentFilter === 'all' || sev === currentFilter;
+            const matchSearch = !query ||
+                (t.component || '').toLowerCase().includes(query) ||
+                (t.description || '').toLowerCase().includes(query) ||
+                (t.category || '').toLowerCase().includes(query);
+            return matchFilter && matchSearch;
+        });
+        renderThreats(filtered);
+    }
+
+    function renderThreats(threats) {
+        const container = document.getElementById('threatsContainer');
+        const badge = document.getElementById('threatCountBadge');
+        const info = document.getElementById('threatCountInfo');
+
+        badge.textContent = threats.length + ' amenaza' + (threats.length !== 1 ? 's' : '');
+        info.textContent = `Mostrando ${threats.length} de ${allThreats.length} amenazas detectadas`;
+
+        if (!threats.length) {
+            container.innerHTML = '<div class="empty-state"><div class="icon">🔍</div>No se encontraron amenazas con los filtros actuales</div>';
+            return;
+        }
+
+        container.innerHTML = threats.map((t, i) => {
+            const catClass = getCategoryClass(t.category);
+            const catLabel = getCategoryLabel(t.category);
+            const sevClass = getSevClass(t.severity);
+            const confirmed = t.confirmed === true ? '<span class="confirmed-yes">✅ Confirmada</span>' : '<span class="confirmed-no">— Sin confirmar</span>';
+            return `
+            <div class="threat-row" onclick="toggleDetail(${i})">
+                <div class="threat-main">
+                    <span class="threat-category-tag ${catClass}">${catLabel}</span>
+                    <span class="threat-component">${escHtml(t.component || '—')}</span>
+                    <span class="threat-desc">${escHtml(t.description || '')}</span>
+                    <span class="sev-badge ${sevClass} threat-status">${escHtml(t.severity || '—')}</span>
+                    <span class="threat-status" style="text-align:right;">${confirmed}</span>
+                </div>
+                <div class="threat-details" id="detail-${i}">
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Descripción</div>
+                            <div class="detail-value">${escHtml(t.description || '—')}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Evidencia</div>
+                            <div class="detail-value">${escHtml(t.evidence || '—')}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Mitigación</div>
+                            <div class="detail-value">${escHtml(t.mitigation || '—')}</div>
+                        </div>
+                        ${t.dynamic_validation ? `<div class="detail-item">
+                            <div class="detail-label">Validación Dinámica</div>
+                            <div class="detail-value">${escHtml(t.dynamic_validation.evidence || '')} (HTTP ${t.dynamic_validation.response_code || '—'})</div>
+                        </div>` : ''}
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function toggleDetail(i) {
+        const el = document.getElementById('detail-' + i);
+        if (el) el.classList.toggle('open');
+    }
+
+    function exportJSON() {
+        if (!reportData) return;
+        const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'combined-report.json';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function escHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    window.addEventListener('load', loadData);
+</script>
 </body>
 </html>
